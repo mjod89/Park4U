@@ -1,0 +1,35 @@
+# IoT Gateway (e.g., using Eclipse Mosquitto MQTT Broker)
+import paho.mqtt.client as mqtt
+
+# Callback function for when a message is received
+def on_message(client, userdata, message):
+    payload = str(message.payload.decode("utf-8"))
+    topic = message.topic
+    # Process the received data (e.g., parking sensor data)
+    process_sensor_data(topic, payload)
+
+# Connect to the MQTT broker and subscribe to relevant topics
+client = mqtt.Client()
+client.on_message = on_message
+client.connect("mqtt.broker.com", 1883, 60)
+client.subscribe("parking/sensor/#")
+
+# Parking Sensor (e.g., using ESP32 or Raspberry Pi with MQTT client)
+import network
+import time
+from umqtt.robust import MQTTClient
+
+# Connect to WiFi network
+sta_if = network.WLAN(network.STA_IF)
+sta_if.active(True)
+sta_if.connect("WiFi_SSID", "WiFi_Password")
+
+# Connect to MQTT broker
+client = MQTTClient("parking_sensor", "mqtt.broker.com", user="username", password="password")
+client.connect()
+
+# Send sensor data periodically
+while True:
+    sensor_data = read_sensor_data()
+    client.publish("parking/sensor/123", str(sensor_data))
+    time.sleep(60)  # Send data every 60 seconds
