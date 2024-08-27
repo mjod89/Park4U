@@ -1,0 +1,24 @@
+// Solidity smart contract
+pragma solidity ^0.8.0;
+
+contract ParkingContract {
+    struct ParkingSpot {
+        bool occupied;
+        address owner;
+        uint256 lastUpdated;
+    }
+
+    mapping(uint256 => ParkingSpot) public parkingSpots;
+
+    event ParkingSpotUpdated(uint256 spotId, bool occupied);
+
+    function updateParkingSpot(uint256 spotId, bool occupied) public {
+        parkingSpots[spotId] = ParkingSpot(occupied, msg.sender, block.timestamp);
+        emit ParkingSpotUpdated(spotId, occupied);
+    }
+
+    function getParkingSpotStatus(uint256 spotId) public view returns (bool, address, uint256) {
+        ParkingSpot storage spot = parkingSpots[spotId];
+        return (spot.occupied, spot.owner, spot.lastUpdated);
+    }
+}
